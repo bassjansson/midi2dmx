@@ -6,7 +6,7 @@
 
 void setup() {
     // Initialize serial debug
-    // Serial.begin(115200);
+    Serial.begin(115200);
 
     // Setup DMX
     DmxSimple.usePin(DMX_TX_PIN);
@@ -25,17 +25,35 @@ void setup() {
 }
 
 void loop() {
-    unsigned long inter = 10ul * 1000ul; // ms
+    static String str = "";
+    static int pos = 0;
+    static uint8_t data[2] = {0, 0};
 
-    // TODO: this modulo will be faulty once every 50 days
-    double theta = fmod((double)(millis() % inter) / (double)inter + 0.25, 1.0);
-    double wave = sin(theta * M_PI * 2.0) * 0.5 + 0.5;
-    uint8_t value = (wave * wave * wave * wave) * 255;
+    while (Serial.available()) {
+        char c = Serial.read();
 
-    DmxSimple.write(4, value);
-    DmxSimple.write(7, value);
-    DmxSimple.write(9, value);
-    DmxSimple.write(18, value);
+        if (c == '\n') {
+            if (pos < 2)
+                data[pos] = str.toInt();
+
+            DmxSimple.write(data[0], data[1]);
+
+            str = "";
+            pos = 0;
+            data[0] = 0;
+            data[1] = 0;
+        }
+        else if (c == ',') {
+            if (pos < 2)
+                data[pos] = str.toInt();
+
+            str = "";
+            pos++;
+        }
+        else {
+            str += c;
+        }
+    }
 
     delay(20);
 }
