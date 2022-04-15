@@ -6,7 +6,7 @@
 
 void setup() {
     // Initialize serial debug
-    Serial.begin(115200);
+    Serial.begin(9600);
 
     // Setup DMX
     DmxSimple.usePin(DMX_TX_PIN);
