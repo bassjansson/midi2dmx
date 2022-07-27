@@ -68,22 +68,22 @@ void loop()
 void initDmxChannels()
 {
     // Small RGB PAR
-    DmxSimple.write(01, 255); // Dimmer
-    DmxSimple.write(02, 32);  // Red
-    DmxSimple.write(03, 32);  // Green
-    DmxSimple.write(04, 32);  // Blue
-    DmxSimple.write(05, 0);   // Strobe
-    DmxSimple.write(06, 0);   // Programs
+    DmxSimple.write(1, 255); // Dimmer
+    DmxSimple.write(2, 0);   // Red
+    DmxSimple.write(3, 0);   // Green
+    DmxSimple.write(4, 0);   // Blue
+    DmxSimple.write(5, 0);   // Strobe
+    DmxSimple.write(6, 0);   // Programs
 
     // Ayra Flash 60 Strobe
-    DmxSimple.write(07, 32); // Dimmer
-    DmxSimple.write(08, 0);  // Strobe
+    DmxSimple.write(7, 0); // Dimmer
+    DmxSimple.write(8, 0); // Strobe
 
     // ADJ Mega Hex Par
-    DmxSimple.write(09, 0);   // Red
+    DmxSimple.write(9, 0);    // Red
     DmxSimple.write(10, 0);   // Green
     DmxSimple.write(11, 0);   // Blue
-    DmxSimple.write(12, 32);  // White
+    DmxSimple.write(12, 0);   // White
     DmxSimple.write(13, 0);   // Amber
     DmxSimple.write(14, 0);   // UV
     DmxSimple.write(15, 255); // Dimmer
@@ -93,7 +93,7 @@ void initDmxChannels()
     DmxSimple.write(17, 0);   // Red
     DmxSimple.write(18, 0);   // Green
     DmxSimple.write(19, 0);   // Blue
-    DmxSimple.write(20, 32);  // White
+    DmxSimple.write(20, 0);   // White
     DmxSimple.write(21, 0);   // Amber
     DmxSimple.write(22, 0);   // UV
     DmxSimple.write(23, 255); // Dimmer
