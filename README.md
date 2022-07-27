@@ -32,6 +32,10 @@ Enjoy! :)
 
 Use the Arduino IDE and select **Arduino Leonardo** as the board, doesn't matter which 32U4 board you have from the list of boards above.
 
+## Schematic
+
+![schematic](./schematic.jpg)
+
 ## You're welcome!
 
 Bass Jansson, Technology for the Arts
