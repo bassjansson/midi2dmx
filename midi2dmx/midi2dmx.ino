@@ -1,10 +1,13 @@
 #include <USB-MIDI.h>
 #include <DmxSimple.h>
 
-#define MIDI_CHANNEL 1
-#define DMX_TX_PIN   1
-#define DMX_DE_PIN   2
-#define DMX_NUM_CHAN 24
+#define ON_LED_PIN   13 // Built-in LED, change if using another pin
+
+#define DMX_TX_PIN   1  // Transmit pin, connect to DI of MAX485 module
+#define DMX_DE_PIN   10 // Enable pin, connect to DE+RE of MAX485 module
+
+#define MIDI_CHANNEL 1  // MIDI channel to listen to
+#define DMX_NUM_CHAN 24 // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
 
 using namespace MIDI_NAMESPACE;
 
@@ -16,6 +19,10 @@ void setup()
     // Serial.begin(115200);
     // while (!Serial)
     //     ;
+
+    // Setup and turn on the 'on' LED
+    pinMode(ON_LED_PIN, OUTPUT);
+    digitalWrite(ON_LED_PIN, HIGH);
 
     // Listen for MIDI messages on specified channel
     MIDI.begin(MIDI_CHANNEL);
@@ -48,17 +55,45 @@ void setup()
     pinMode(DMX_DE_PIN, OUTPUT);
     digitalWrite(DMX_DE_PIN, HIGH);
 
-    // Init some lights
-    DmxSimple.write(8 + 7, 255);
-    DmxSimple.write(8 + 8, 255);
-    DmxSimple.write(16 + 7, 255);
-    DmxSimple.write(16 + 8, 255);
+    // Init all DMX channels
+    initDmxChannels();
 } // setup
 
 void loop()
 {
     // Listen to incoming notes
     MIDI.read();
+}
+
+void initDmxChannels()
+{
+    DmxSimple.write(1, 0);
+    DmxSimple.write(2, 0);
+    DmxSimple.write(3, 0);
+    DmxSimple.write(4, 0);
+    DmxSimple.write(5, 0);
+    DmxSimple.write(6, 0);
+
+    DmxSimple.write(7, 32); // Dimmer
+    DmxSimple.write(8, 0);  // Strobe
+
+    DmxSimple.write(9, 0);
+    DmxSimple.write(10, 0);
+    DmxSimple.write(11, 0);
+    DmxSimple.write(12, 0);
+    DmxSimple.write(13, 0);
+    DmxSimple.write(14, 0);
+    DmxSimple.write(15, 255);
+    DmxSimple.write(16, 255);
+
+    DmxSimple.write(17, 0);
+    DmxSimple.write(18, 0);
+    DmxSimple.write(19, 0);
+    DmxSimple.write(20, 0);
+    DmxSimple.write(21, 0);
+    DmxSimple.write(22, 0);
+    DmxSimple.write(23, 255);
+    DmxSimple.write(24, 255);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
@@ -70,8 +105,9 @@ static void OnNoteOn(byte channel, byte note, byte velocity)
     // Serial.print(F(", velocity: "));
     // Serial.println(velocity);
 
+    // Simply map MIDI note number to DMX channels
     if (note > 0 && note <= DMX_NUM_CHAN)
-        DmxSimple.write(note, velocity * 2);
+        DmxSimple.write(note, velocity * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
 }
 
 static void OnNoteOff(byte channel, byte note, byte velocity)
@@ -83,8 +119,9 @@ static void OnNoteOff(byte channel, byte note, byte velocity)
     // Serial.print(F(", velocity: "));
     // Serial.println(velocity);
 
+    // Simply map MIDI note number to DMX channels
     if (note > 0 && note <= DMX_NUM_CHAN)
-        DmxSimple.write(note, 0);
+        DmxSimple.write(note, 0); // Just turn off the light
 }
 
 static void OnAfterTouchPoly(byte channel, byte note, byte pressure)
@@ -106,8 +143,9 @@ static void OnControlChange(byte channel, byte number, byte value)
     // Serial.print(F(", value: "));
     // Serial.println(value);
 
+    // Simply map MIDI control number to DMX channels
     if (number > 0 && number <= DMX_NUM_CHAN)
-        DmxSimple.write(number, value * 2);
+        DmxSimple.write(number, value * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
 }
 
 static void OnProgramChange(byte channel, byte number)
@@ -180,6 +218,9 @@ static void OnContinue()
 static void OnStop()
 {
     // Serial.println(F("Stop"));
+
+    // Reset all DMX channels on MIDI transport stop
+    initDmxChannels();
 }
 
 static void OnActiveSensing()
@@ -190,4 +231,7 @@ static void OnActiveSensing()
 static void OnSystemReset()
 {
     // Serial.println(F("SystemReset"));
+
+    // Reset all DMX channels on MIDI system reset
+    initDmxChannels();
 }
