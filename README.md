@@ -34,7 +34,11 @@ Use the Arduino IDE and select **Arduino Leonardo** as the board, doesn't matter
 
 ## Schematic
 
-![schematic](./schematic.jpg)
+![schematic](./images/schematic.jpg)
+
+## Finished Device
+
+![device](./images/device.jpg)
 
 ## You're welcome!
 
