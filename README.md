@@ -1,5 +1,7 @@
 # MIDI2DMX
 
+[Video Tutorial on YouTube :)](https://youtu.be/dqrqfa0cMyE)
+
 ## USB-MIDI to DMX-out
 
 Firmware for a tiny but powerful tool which acts as a USB-MIDI device just like any modern synthesizer, but it doesn't make any sounds, it sends the MIDI messages as DMX values to your DMX lights system instead!
