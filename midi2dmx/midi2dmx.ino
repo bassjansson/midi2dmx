@@ -1,17 +1,25 @@
-#include <USB-MIDI.h>
+// #define USING_USB_MIDI // Uncomment this define to use USB-MIDI
+
+#ifndef USING_USB_MIDI
+    // DIN-5 Serial MIDI
+    #include <MIDI.h>
+MIDI_CREATE_DEFAULT_INSTANCE();
+#else
+    // USB-MIDI
+    #include <USB-MIDI.h>
+USBMIDI_CREATE_DEFAULT_INSTANCE();
+using namespace MIDI_NAMESPACE;
+#endif
+
 #include <DmxSimple.h>
 
 #define ON_LED_PIN   13 // Built-in LED, change if using another pin
 
-#define DMX_TX_PIN   1  // Transmit pin, connect to DI of MAX485 module
-#define DMX_DE_PIN   10 // Enable pin, connect to DE+RE of MAX485 module
+#define DMX_TX_PIN   4 // Transmit pin, connect to DI of MAX485 module
+#define DMX_DE_PIN   2 // Enable pin, connect to DE+RE of MAX485 module
 
-#define MIDI_CHANNEL 1  // MIDI channel to listen to
-#define DMX_NUM_CHAN 24 // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
-
-using namespace MIDI_NAMESPACE;
-
-USBMIDI_CREATE_DEFAULT_INSTANCE();
+#define MIDI_CHANNEL MIDI_CHANNEL_OMNI // MIDI channel to listen to, omni means all channels
+#define DMX_NUM_CHAN 24                // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
 
 void setup()
 {
