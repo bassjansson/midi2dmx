@@ -1,18 +1,17 @@
 // #define ENABLE_SERIAL_DEBUG // Uncomment this define to enable serial debugging
-// #define USING_USB_MIDI // Uncomment this define to use USB-MIDI
 
-#ifndef USING_USB_MIDI
-    // DIN-5 Serial MIDI
-    #include <MIDI.h>
-MIDI_CREATE_DEFAULT_INSTANCE();
-#else
-    // USB-MIDI
-    #include <USB-MIDI.h>
-USBMIDI_CREATE_DEFAULT_INSTANCE();
-using namespace MIDI_NAMESPACE;
-#endif
-
+#include <USB-MIDI.h>
 #include <DmxSimple.h>
+
+USING_NAMESPACE_MIDI;
+
+typedef USBMIDI_NAMESPACE::usbMidiTransport  __umt;
+typedef MIDI_NAMESPACE::MidiInterface<__umt> __ss;
+
+__umt usbMIDI(0);                   // cableNr
+__ss  MIDICoreUSB((__umt&)usbMIDI); // USB-MIDI
+
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDICoreSerial); // DIN-5 Serial MIDI
 
 #define ON_LED_PIN   13 // Built-in LED, change if using another pin
 
@@ -35,28 +34,48 @@ void setup()
     pinMode(ON_LED_PIN, OUTPUT);
     digitalWrite(ON_LED_PIN, HIGH);
 
-    // Listen for MIDI messages on specified channel
-    MIDI.begin(MIDI_CHANNEL);
-
     // Setup all MIDI event callbacks
-    MIDI.setHandleNoteOn(OnNoteOn);
-    MIDI.setHandleNoteOff(OnNoteOff);
-    MIDI.setHandleAfterTouchPoly(OnAfterTouchPoly);
-    MIDI.setHandleControlChange(OnControlChange);
-    MIDI.setHandleProgramChange(OnProgramChange);
-    MIDI.setHandleAfterTouchChannel(OnAfterTouchChannel);
-    MIDI.setHandlePitchBend(OnPitchBend);
-    MIDI.setHandleSystemExclusive(OnSystemExclusive);
-    MIDI.setHandleTimeCodeQuarterFrame(OnTimeCodeQuarterFrame);
-    MIDI.setHandleSongPosition(OnSongPosition);
-    MIDI.setHandleSongSelect(OnSongSelect);
-    MIDI.setHandleTuneRequest(OnTuneRequest);
-    MIDI.setHandleClock(OnClock);
-    MIDI.setHandleStart(OnStart);
-    MIDI.setHandleContinue(OnContinue);
-    MIDI.setHandleStop(OnStop);
-    MIDI.setHandleActiveSensing(OnActiveSensing);
-    MIDI.setHandleSystemReset(OnSystemReset);
+    MIDICoreUSB.setHandleNoteOn(OnNoteOn);
+    MIDICoreUSB.setHandleNoteOff(OnNoteOff);
+    MIDICoreUSB.setHandleAfterTouchPoly(OnAfterTouchPoly);
+    MIDICoreUSB.setHandleControlChange(OnControlChange);
+    MIDICoreUSB.setHandleProgramChange(OnProgramChange);
+    MIDICoreUSB.setHandleAfterTouchChannel(OnAfterTouchChannel);
+    MIDICoreUSB.setHandlePitchBend(OnPitchBend);
+    MIDICoreUSB.setHandleSystemExclusive(OnSystemExclusive);
+    MIDICoreUSB.setHandleTimeCodeQuarterFrame(OnTimeCodeQuarterFrame);
+    MIDICoreUSB.setHandleSongPosition(OnSongPosition);
+    MIDICoreUSB.setHandleSongSelect(OnSongSelect);
+    MIDICoreUSB.setHandleTuneRequest(OnTuneRequest);
+    MIDICoreUSB.setHandleClock(OnClock);
+    MIDICoreUSB.setHandleStart(OnStart);
+    MIDICoreUSB.setHandleContinue(OnContinue);
+    MIDICoreUSB.setHandleStop(OnStop);
+    MIDICoreUSB.setHandleActiveSensing(OnActiveSensing);
+    MIDICoreUSB.setHandleSystemReset(OnSystemReset);
+
+    MIDICoreSerial.setHandleNoteOn(OnNoteOn);
+    MIDICoreSerial.setHandleNoteOff(OnNoteOff);
+    MIDICoreSerial.setHandleAfterTouchPoly(OnAfterTouchPoly);
+    MIDICoreSerial.setHandleControlChange(OnControlChange);
+    MIDICoreSerial.setHandleProgramChange(OnProgramChange);
+    MIDICoreSerial.setHandleAfterTouchChannel(OnAfterTouchChannel);
+    MIDICoreSerial.setHandlePitchBend(OnPitchBend);
+    MIDICoreSerial.setHandleSystemExclusive(OnSystemExclusive);
+    MIDICoreSerial.setHandleTimeCodeQuarterFrame(OnTimeCodeQuarterFrame);
+    MIDICoreSerial.setHandleSongPosition(OnSongPosition);
+    MIDICoreSerial.setHandleSongSelect(OnSongSelect);
+    MIDICoreSerial.setHandleTuneRequest(OnTuneRequest);
+    MIDICoreSerial.setHandleClock(OnClock);
+    MIDICoreSerial.setHandleStart(OnStart);
+    MIDICoreSerial.setHandleContinue(OnContinue);
+    MIDICoreSerial.setHandleStop(OnStop);
+    MIDICoreSerial.setHandleActiveSensing(OnActiveSensing);
+    MIDICoreSerial.setHandleSystemReset(OnSystemReset);
+
+    // Listen for MIDI messages on specified channel
+    MIDICoreUSB.begin(MIDI_CHANNEL);
+    MIDICoreSerial.begin(MIDI_CHANNEL);
 
     // Setup DMX
     DmxSimple.usePin(DMX_TX_PIN);
@@ -73,7 +92,8 @@ void setup()
 void loop()
 {
     // Listen to incoming notes
-    MIDI.read();
+    MIDICoreUSB.read();
+    MIDICoreSerial.read();
 }
 
 void initDmxChannels()

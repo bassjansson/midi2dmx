@@ -26,9 +26,11 @@ Enjoy! :)
 
 ## What software do I need?
 
-- Arduino IDE
-- Arduino USB-MIDI Library (https://github.com/lathoub/Arduino-USBMIDI)
-- Arduino DmxSimple Library (https://github.com/PaulStoffregen/DmxSimple)
+- [Arduino IDE](https://www.arduino.cc/en/software)
+- [Arduino MIDI Library](https://github.com/FortySevenEffects/arduino_midi_library)
+- [Arduino MIDIUSB Library](https://github.com/arduino-libraries/MIDIUSB)
+- [Arduino USB-MIDI Library](https://github.com/lathoub/Arduino-USBMIDI)
+- [Arduino DmxSimple Library](https://github.com/PaulStoffregen/DmxSimple)
 
 ## How to upload the code?
 
