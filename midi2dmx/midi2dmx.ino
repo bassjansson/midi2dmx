@@ -1,3 +1,4 @@
+// #define ENABLE_SERIAL_DEBUG // Uncomment this define to enable serial debugging
 // #define USING_USB_MIDI // Uncomment this define to use USB-MIDI
 
 #ifndef USING_USB_MIDI
@@ -23,10 +24,12 @@ using namespace MIDI_NAMESPACE;
 
 void setup()
 {
+#ifdef ENABLE_SERIAL_DEBUG
     // Initialize serial communication
-    // Serial.begin(115200);
-    // while (!Serial)
-    //     ;
+    Serial.begin(115200);
+    while (!Serial) // Wait for native USB
+        delay(1);
+#endif
 
     // Setup and turn on the 'on' LED
     pinMode(ON_LED_PIN, OUTPUT);
@@ -108,12 +111,14 @@ void initDmxChannels()
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
 {
-    // Serial.print(F("NoteOn  from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", note: "));
-    // Serial.print(note);
-    // Serial.print(F(", velocity: "));
-    // Serial.println(velocity);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("NoteOn  from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", note: "));
+    Serial.print(note);
+    Serial.print(F(", velocity: "));
+    Serial.println(velocity);
+#endif
 
     // Simply map MIDI note number to DMX channels
     if (note > 0 && note <= DMX_NUM_CHAN)
@@ -122,12 +127,14 @@ static void OnNoteOn(byte channel, byte note, byte velocity)
 
 static void OnNoteOff(byte channel, byte note, byte velocity)
 {
-    // Serial.print(F("NoteOff from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", note: "));
-    // Serial.print(note);
-    // Serial.print(F(", velocity: "));
-    // Serial.println(velocity);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("NoteOff from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", note: "));
+    Serial.print(note);
+    Serial.print(F(", velocity: "));
+    Serial.println(velocity);
+#endif
 
     // Simply map MIDI note number to DMX channels
     if (note > 0 && note <= DMX_NUM_CHAN)
@@ -136,22 +143,26 @@ static void OnNoteOff(byte channel, byte note, byte velocity)
 
 static void OnAfterTouchPoly(byte channel, byte note, byte pressure)
 {
-    // Serial.print(F("AfterTouchPoly from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", note: "));
-    // Serial.print(note);
-    // Serial.print(F(", pressure: "));
-    // Serial.println(pressure);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("AfterTouchPoly from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", note: "));
+    Serial.print(note);
+    Serial.print(F(", pressure: "));
+    Serial.println(pressure);
+#endif
 }
 
 static void OnControlChange(byte channel, byte number, byte value)
 {
-    // Serial.print(F("ControlChange from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", number: "));
-    // Serial.print(number);
-    // Serial.print(F(", value: "));
-    // Serial.println(value);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("ControlChange from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", number: "));
+    Serial.print(number);
+    Serial.print(F(", value: "));
+    Serial.println(value);
+#endif
 
     // Simply map MIDI control number to DMX channels
     if (number > 0 && number <= DMX_NUM_CHAN)
@@ -160,74 +171,98 @@ static void OnControlChange(byte channel, byte number, byte value)
 
 static void OnProgramChange(byte channel, byte number)
 {
-    // Serial.print(F("ProgramChange from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", number: "));
-    // Serial.println(number);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("ProgramChange from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", number: "));
+    Serial.println(number);
+#endif
 }
 
 static void OnAfterTouchChannel(byte channel, byte pressure)
 {
-    // Serial.print(F("AfterTouchChannel from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", pressure: "));
-    // Serial.println(pressure);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("AfterTouchChannel from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", pressure: "));
+    Serial.println(pressure);
+#endif
 }
 
 static void OnPitchBend(byte channel, int bend)
 {
-    // Serial.print(F("PitchBend from channel: "));
-    // Serial.print(channel);
-    // Serial.print(F(", bend: "));
-    // Serial.println(bend);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("PitchBend from channel: "));
+    Serial.print(channel);
+    Serial.print(F(", bend: "));
+    Serial.println(bend);
+#endif
 }
 
 static void OnSystemExclusive(byte * array, unsigned size)
 {
-    // Serial.println(F("SystemExclusive"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("SystemExclusive"));
+#endif
 }
 
 static void OnTimeCodeQuarterFrame(byte data)
 {
-    // Serial.print(F("TimeCodeQuarterFrame: "));
-    // Serial.println(data, HEX);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("TimeCodeQuarterFrame: "));
+    Serial.println(data, HEX);
+#endif
 }
 
 static void OnSongPosition(unsigned beats)
 {
-    // Serial.print(F("SongPosition: "));
-    // Serial.println(beats);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("SongPosition: "));
+    Serial.println(beats);
+#endif
 }
 
 static void OnSongSelect(byte songnumber)
 {
-    // Serial.print(F("SongSelect: "));
-    // Serial.println(songnumber);
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.print(F("SongSelect: "));
+    Serial.println(songnumber);
+#endif
 }
 
 static void OnTuneRequest()
 {
-    // Serial.println(F("TuneRequest"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("TuneRequest"));
+#endif
 }
 
 static void OnClock()
 {
-    // Serial.println(F("Clock"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("Clock"));
+#endif
 }
 
 static void OnStart()
 {
-    // Serial.println(F("Start"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("Start"));
+#endif
 }
 
 static void OnContinue()
 {
-    // Serial.println(F("Continue"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("Continue"));
+#endif
 }
 
 static void OnStop()
 {
-    // Serial.println(F("Stop"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("Stop"));
+#endif
 
     // Reset all DMX channels on MIDI transport stop
     initDmxChannels();
@@ -235,12 +270,16 @@ static void OnStop()
 
 static void OnActiveSensing()
 {
-    // Serial.println(F("ActiveSensing"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("ActiveSensing"));
+#endif
 }
 
 static void OnSystemReset()
 {
-    // Serial.println(F("SystemReset"));
+#ifdef ENABLE_SERIAL_DEBUG
+    Serial.println(F("SystemReset"));
+#endif
 
     // Reset all DMX channels on MIDI system reset
     initDmxChannels();
