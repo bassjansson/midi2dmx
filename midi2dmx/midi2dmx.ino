@@ -1,25 +1,38 @@
 // #define ENABLE_SERIAL_DEBUG // Uncomment this define to enable serial debugging
 
-#include <USB-MIDI.h>
+#define USE_USB_MIDI    // Comment this define to disable use of USB-MIDI
+#define USE_SERIAL_MIDI // Comment this define to disable use of DIN-5 Serial MIDI
+
+#ifdef USE_USB_MIDI
+    #include <USB-MIDI.h>
+#endif
+#ifdef USE_SERIAL_MIDI
+    #include <MIDI.h>
+#endif
 #include <DmxSimple.h>
 
-USING_NAMESPACE_MIDI;
 
+#define ON_LED_PIN   13 // Built-in LED, change if using another pin
+
+#define DMX_TX_PIN   16 // Transmit pin, connect to DI of MAX485 module
+#define DMX_DE_PIN   9  // Enable pin, connect to DE+RE of MAX485 module
+
+#define MIDI_CHANNEL MIDI_CHANNEL_OMNI // MIDI channel to listen to, omni means all channels
+#define DMX_NUM_CHAN 24                // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
+
+
+#ifdef USE_USB_MIDI
 typedef USBMIDI_NAMESPACE::usbMidiTransport  __umt;
 typedef MIDI_NAMESPACE::MidiInterface<__umt> __ss;
 
 __umt usbMIDI(0);                   // cableNr
 __ss  MIDICoreUSB((__umt&)usbMIDI); // USB-MIDI
+#endif
 
+#ifdef USE_SERIAL_MIDI
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDICoreSerial); // DIN-5 Serial MIDI
+#endif
 
-#define ON_LED_PIN   13 // Built-in LED, change if using another pin
-
-#define DMX_TX_PIN   4 // Transmit pin, connect to DI of MAX485 module
-#define DMX_DE_PIN   2 // Enable pin, connect to DE+RE of MAX485 module
-
-#define MIDI_CHANNEL MIDI_CHANNEL_OMNI // MIDI channel to listen to, omni means all channels
-#define DMX_NUM_CHAN 24                // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
 
 void setup()
 {
@@ -34,6 +47,7 @@ void setup()
     pinMode(ON_LED_PIN, OUTPUT);
     digitalWrite(ON_LED_PIN, HIGH);
 
+#ifdef USE_USB_MIDI
     // Setup all MIDI event callbacks
     MIDICoreUSB.setHandleNoteOn(OnNoteOn);
     MIDICoreUSB.setHandleNoteOff(OnNoteOff);
@@ -54,6 +68,12 @@ void setup()
     MIDICoreUSB.setHandleActiveSensing(OnActiveSensing);
     MIDICoreUSB.setHandleSystemReset(OnSystemReset);
 
+    // Listen for MIDI messages on specified channel
+    MIDICoreUSB.begin(MIDI_CHANNEL);
+#endif
+
+#ifdef USE_SERIAL_MIDI
+    // Setup all MIDI event callbacks
     MIDICoreSerial.setHandleNoteOn(OnNoteOn);
     MIDICoreSerial.setHandleNoteOff(OnNoteOff);
     MIDICoreSerial.setHandleAfterTouchPoly(OnAfterTouchPoly);
@@ -74,8 +94,8 @@ void setup()
     MIDICoreSerial.setHandleSystemReset(OnSystemReset);
 
     // Listen for MIDI messages on specified channel
-    MIDICoreUSB.begin(MIDI_CHANNEL);
     MIDICoreSerial.begin(MIDI_CHANNEL);
+#endif
 
     // Setup DMX
     DmxSimple.usePin(DMX_TX_PIN);
@@ -91,9 +111,15 @@ void setup()
 
 void loop()
 {
+#ifdef USE_USB_MIDI
     // Listen to incoming notes
     MIDICoreUSB.read();
+#endif
+
+#ifdef USE_SERIAL_MIDI
+    // Listen to incoming notes
     MIDICoreSerial.read();
+#endif
 }
 
 void initDmxChannels()
