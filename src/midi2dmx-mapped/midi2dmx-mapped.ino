@@ -33,6 +33,24 @@ __ss  MIDICoreUSB((__umt&)usbMIDI); // USB-MIDI
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDICoreSerial); // DIN-5 Serial MIDI
 #endif
 
+struct RgbColor
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
+uint8_t dmxTargetBuff[DMX_NUM_CHAN];
+uint8_t dmxCurrentBuff[DMX_NUM_CHAN];
+
+uint8_t lastNoteNumber   = 21; // default to color magenta
+uint8_t lastNoteVelocity = 63; // default to half brightness
+
+float colorDimmer = 1.0f;
+float colorBend   = 0.0f;
+
+int fadeNegInterval  = 5; // interval in ms
+int fadePosIncrement = 2; // increment
 
 void setup()
 {
@@ -107,6 +125,10 @@ void setup()
 
     // Init all DMX channels
     initDmxChannels();
+
+    // Copy target buff values to the current one for a smooth startup
+    for (int i = 0; i < DMX_NUM_CHAN; ++i)
+        dmxCurrentBuff[i] = dmxTargetBuff[i];
 } // setup
 
 void loop()
@@ -120,39 +142,195 @@ void loop()
     // Listen to incoming notes
     MIDICoreSerial.read();
 #endif
+
+    // Update DMX values by notes played
+    updateDmxByNotes();
+
+    // Send DMX values to lights
+    dmxUpdate();
+}
+
+void dmxWrite(uint16_t channel, uint8_t value)
+{
+    uint16_t c = channel - 1;
+
+    if (c < DMX_NUM_CHAN)
+        dmxTargetBuff[c] = value;
+}
+
+void dmxUpdate()
+{
+    static unsigned long fadeTime = 0;
+
+    if (millis() >= fadeTime)
+    {
+        fadeTime = millis() + fadeNegInterval;
+
+        for (int i = 0; i < DMX_NUM_CHAN; ++i)
+        {
+            int16_t diff = (int16_t)dmxTargetBuff[i] - (int16_t)dmxCurrentBuff[i];
+
+            if (diff > 0)
+                dmxCurrentBuff[i] += diff > fadePosIncrement ? fadePosIncrement : diff;
+            else if (diff < 0)
+                dmxCurrentBuff[i]--;
+
+            DmxSimple.write(i + 1, dmxCurrentBuff[i]);
+        }
+    }
 }
 
 void initDmxChannels()
 {
     // Init your lights here.
     // It might be that some of your lights need some channels
-    // to be on another state than 0 before they go on at all.
+    // to be on another state than 0 before they turn on at all.
     // For example, I have some lights which need some channels
-    // to be 255 to go on.
-    DmxSimple.write(1, 0);
-    DmxSimple.write(2, 0);
-    DmxSimple.write(3, 0);
-    DmxSimple.write(4, 0);
-    DmxSimple.write(5, 0);
-    DmxSimple.write(6, 0);
-    DmxSimple.write(7, 0);
-    DmxSimple.write(8, 0);
-    DmxSimple.write(9, 0);
-    DmxSimple.write(10, 0);
-    DmxSimple.write(11, 0);
-    DmxSimple.write(12, 0);
-    DmxSimple.write(13, 0);
-    DmxSimple.write(14, 0);
-    DmxSimple.write(15, 0);
-    DmxSimple.write(16, 0);
-    DmxSimple.write(17, 0);
-    DmxSimple.write(18, 0);
-    DmxSimple.write(19, 0);
-    DmxSimple.write(20, 0);
-    DmxSimple.write(21, 0);
-    DmxSimple.write(22, 0);
-    DmxSimple.write(23, 0);
-    DmxSimple.write(24, 0);
+    // to be 255 to turn on.
+
+    dmxWrite(1, 255);
+    dmxWrite(2, 0); // R
+    dmxWrite(3, 0); // G
+    dmxWrite(4, 0); // B
+    dmxWrite(5, 0);
+    dmxWrite(6, 0);
+
+    dmxWrite(7, 0); // W
+    dmxWrite(8, 0);
+
+    dmxWrite(9, 0);  // R
+    dmxWrite(10, 0); // G
+    dmxWrite(11, 0); // B
+    dmxWrite(12, 0); // W
+    dmxWrite(13, 0); // A
+    dmxWrite(14, 0); // UV
+    dmxWrite(15, 255);
+    dmxWrite(16, 255);
+
+    dmxWrite(17, 0); // R
+    dmxWrite(18, 0); // G
+    dmxWrite(19, 0); // B
+    dmxWrite(20, 0); // W
+    dmxWrite(21, 0); // A
+    dmxWrite(22, 0); // UV
+    dmxWrite(23, 255);
+    dmxWrite(24, 255);
+}
+
+void writeRgb(RgbColor rgb)
+{
+    dmxWrite(2, rgb.r); // R
+    dmxWrite(3, rgb.g); // G
+    dmxWrite(4, rgb.b); // B
+
+    dmxWrite(9, rgb.r);  // R
+    dmxWrite(10, rgb.g); // G
+    dmxWrite(11, rgb.b); // B
+
+    dmxWrite(17, rgb.r); // R
+    dmxWrite(18, rgb.g); // G
+    dmxWrite(19, rgb.b); // B
+}
+
+RgbColor hsl2rgb(uint8_t hue, uint8_t saturation, uint8_t lightness)
+{
+    RgbColor rgb;
+
+    if (saturation == 0)
+    {
+        rgb.r = lightness;
+        rgb.g = lightness;
+        rgb.b = lightness;
+
+        return rgb;
+    }
+
+    uint16_t h = hue;
+    uint16_t s = saturation;
+    uint16_t v = lightness;
+    uint8_t  a = h / 43;
+    uint16_t m = (h - (a * 43)) * 6;
+    uint8_t  p = (v * (255 - s)) >> 8;
+    uint8_t  q = (v * (255 - ((s * m) >> 8))) >> 8;
+    uint8_t  t = (v * (255 - ((s * (255 - m)) >> 8))) >> 8;
+
+    switch (a)
+    {
+        case 0:
+            rgb.r = v;
+            rgb.g = t;
+            rgb.b = p;
+            break;
+        case 1:
+            rgb.r = q;
+            rgb.g = v;
+            rgb.b = p;
+            break;
+        case 2:
+            rgb.r = p;
+            rgb.g = v;
+            rgb.b = t;
+            break;
+        case 3:
+            rgb.r = p;
+            rgb.g = q;
+            rgb.b = v;
+            break;
+        case 4:
+            rgb.r = t;
+            rgb.g = p;
+            rgb.b = v;
+            break;
+        default:
+            rgb.r = v;
+            rgb.g = p;
+            rgb.b = q;
+            break;
+    }
+
+    return rgb;
+}
+
+void updateDmxByNotes()
+{
+    static uint8_t hue   = 0;
+    static uint8_t light = 0;
+    static uint8_t white = 0;
+
+    // First two octaves is color wheel
+    if (lastNoteNumber < 24)
+    {
+        hue   = lastNoteNumber / 24.0f * 256.0f;
+        light = lastNoteVelocity + 128;
+        // white = 0;
+    }
+    // Third octave is white light dimmer
+    else if (lastNoteNumber < 36)
+    {
+        // light = 0;
+        white = (lastNoteNumber - 24) / 11.0f * 255.0f;
+    }
+    // Fourth octave, first half is all lights off
+    else if (lastNoteNumber < 41)
+    {
+        light = 0;
+        white = 0;
+    }
+    // Fourth octave, second half is light fading speed
+    else if (lastNoteNumber < 49)
+    {
+        fadeNegInterval  = lastNoteNumber - 41;
+        fadePosIncrement = 2;
+    }
+
+    // Write color lights
+    writeRgb(hsl2rgb(hue + colorBend * 32.0f, 255, light * colorDimmer));
+
+    // Write white lights
+    uint8_t w = white * colorDimmer;
+    dmxWrite(7, w);
+    dmxWrite(12, w);
+    dmxWrite(20, w);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
@@ -166,9 +344,12 @@ static void OnNoteOn(byte channel, byte note, byte velocity)
     Serial.println(velocity);
 #endif
 
+    lastNoteNumber   = note - 36;
+    lastNoteVelocity = velocity;
+
     // Simply map MIDI note number to DMX channels
-    if (note > 0 && note <= DMX_NUM_CHAN)
-        DmxSimple.write(note, velocity * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
+    // if (note > 0 && note <= DMX_NUM_CHAN)
+    //     dmxWrite(note, velocity * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
 }
 
 static void OnNoteOff(byte channel, byte note, byte velocity)
@@ -183,8 +364,8 @@ static void OnNoteOff(byte channel, byte note, byte velocity)
 #endif
 
     // Simply map MIDI note number to DMX channels
-    if (note > 0 && note <= DMX_NUM_CHAN)
-        DmxSimple.write(note, 0); // Just turn off the light
+    // if (note > 0 && note <= DMX_NUM_CHAN)
+    //     dmxWrite(note, 0); // Just turn off the light
 }
 
 static void OnAfterTouchPoly(byte channel, byte note, byte pressure)
@@ -210,9 +391,12 @@ static void OnControlChange(byte channel, byte number, byte value)
     Serial.println(value);
 #endif
 
+    if (number == 1)
+        colorDimmer = value / 127.0f;
+
     // Simply map MIDI control number to DMX channels
-    if (number > 0 && number <= DMX_NUM_CHAN)
-        DmxSimple.write(number, value * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
+    // if (number > 0 && number <= DMX_NUM_CHAN)
+    //     dmxWrite(number, value * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
 }
 
 static void OnProgramChange(byte channel, byte number)
@@ -243,6 +427,8 @@ static void OnPitchBend(byte channel, int bend)
     Serial.print(F(", bend: "));
     Serial.println(bend);
 #endif
+
+    colorBend = bend / 8192.0f;
 }
 
 static void OnSystemExclusive(byte * array, unsigned size)

@@ -126,33 +126,37 @@ void initDmxChannels()
 {
     // Init your lights here.
     // It might be that some of your lights need some channels
-    // to be on another state than 0 before they go on at all.
+    // to be on another state than 0 before they turn on at all.
     // For example, I have some lights which need some channels
-    // to be 255 to go on.
-    DmxSimple.write(1, 0);
-    DmxSimple.write(2, 0);
-    DmxSimple.write(3, 0);
-    DmxSimple.write(4, 0);
+    // to be 255 to turn on.
+
+    DmxSimple.write(1, 255);
+    DmxSimple.write(2, 0); // R
+    DmxSimple.write(3, 0); // G
+    DmxSimple.write(4, 0); // B
     DmxSimple.write(5, 0);
     DmxSimple.write(6, 0);
-    DmxSimple.write(7, 0);
+
+    DmxSimple.write(7, 0); // W
     DmxSimple.write(8, 0);
-    DmxSimple.write(9, 0);
-    DmxSimple.write(10, 0);
-    DmxSimple.write(11, 0);
-    DmxSimple.write(12, 0);
-    DmxSimple.write(13, 0);
-    DmxSimple.write(14, 0);
-    DmxSimple.write(15, 0);
-    DmxSimple.write(16, 0);
-    DmxSimple.write(17, 0);
-    DmxSimple.write(18, 0);
-    DmxSimple.write(19, 0);
-    DmxSimple.write(20, 0);
-    DmxSimple.write(21, 0);
-    DmxSimple.write(22, 0);
-    DmxSimple.write(23, 0);
-    DmxSimple.write(24, 0);
+
+    DmxSimple.write(9, 0);  // R
+    DmxSimple.write(10, 0); // G
+    DmxSimple.write(11, 0); // B
+    DmxSimple.write(12, 0); // W
+    DmxSimple.write(13, 0); // A
+    DmxSimple.write(14, 0); // UV
+    DmxSimple.write(15, 255);
+    DmxSimple.write(16, 255);
+
+    DmxSimple.write(17, 0); // R
+    DmxSimple.write(18, 0); // G
+    DmxSimple.write(19, 0); // B
+    DmxSimple.write(20, 0); // W
+    DmxSimple.write(21, 0); // A
+    DmxSimple.write(22, 0); // UV
+    DmxSimple.write(23, 255);
+    DmxSimple.write(24, 255);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
