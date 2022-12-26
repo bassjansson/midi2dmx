@@ -138,23 +138,8 @@ void loop()
     MIDICoreSerial.read();
 #endif
 
-    // Send DMX values to lights
-    dmxUpdate();
-}
-
-void dmxWrite(uint16_t channel, uint8_t value)
-{
-    uint16_t c = channel - 1;
-
-    if (c < DMX_NUM_CHAN)
-        dmxTargetBuff[c] = value;
-}
-
-void dmxUpdate()
-{
-    // This method fades DMX target buffer to DMX current buffer
-    // and then writes DMX current buffer to the MAX485 chip.
-
+    // Fade DMX target buffer to DMX current buffer and then
+    // finally write DMX current buffer to the MAX485 chip.
     static unsigned long fadeTime = 0;
 
     if (millis() >= fadeTime)
@@ -175,9 +160,19 @@ void dmxUpdate()
     }
 }
 
+void dmxWrite(uint16_t channel, uint8_t value)
+{
+    // This function writes a DMX value to DMX target buffer.
+
+    uint16_t c = channel - 1;
+
+    if (c < DMX_NUM_CHAN)
+        dmxTargetBuff[c] = value;
+}
+
 void initDmxChannels()
 {
-    // Init your lights here.
+    // Init your lights here!
     // It might be that some of your lights need some channels
     // to be on another state than 0 before they turn on at all.
     // For example, I have some lights which need some channels
@@ -216,9 +211,36 @@ void initDmxChannels()
     dmxWrite(24, 255);
 }
 
+void updateDmxChannels(RgbColor rgb, uint8_t w)
+{
+    // Update your lights here!
+    // The function below calculates the RGB and white values for your lights,
+    // just map them correctly to your lights in this function just as I did.
+
+    // RGB Spot
+    dmxWrite(2, rgb.r); // R
+    dmxWrite(3, rgb.g); // G
+    dmxWrite(4, rgb.b); // B
+
+    // White Strobe
+    dmxWrite(7, w); // W
+
+    // Hex Washer 1
+    dmxWrite(9, rgb.r);  // R
+    dmxWrite(10, rgb.g); // G
+    dmxWrite(11, rgb.b); // B
+    dmxWrite(13, w);     // A
+
+    // Hex Washer 2
+    dmxWrite(17, rgb.r); // R
+    dmxWrite(18, rgb.g); // G
+    dmxWrite(19, rgb.b); // B
+    dmxWrite(21, w);     // A
+}
+
 void updateDmxByMidiIn()
 {
-    // This method updates DMX target buffer by the last midi note played,
+    // This function updates DMX target buffer by the last midi note played,
     // together with pitch bend (color bend) and modulation wheel (dimmer).
 
     static uint8_t hue   = 0;
@@ -251,30 +273,12 @@ void updateDmxByMidiIn()
         fadePosIncrement = 2;
     }
 
-
-    // Calculate new light values and write them to lights
+    // Calculate new light values
     RgbColor rgb = hsl2rgb(hue + colorBend * 32.0f, 255, light * colorDimmer);
     uint8_t  w   = white * colorDimmer;
 
-    // Spot
-    dmxWrite(2, rgb.r); // R
-    dmxWrite(3, rgb.g); // G
-    dmxWrite(4, rgb.b); // B
-
-    // Strobe
-    dmxWrite(7, w); // W
-
-    // Washer 1
-    dmxWrite(9, rgb.r);  // R
-    dmxWrite(10, rgb.g); // G
-    dmxWrite(11, rgb.b); // B
-    dmxWrite(13, w);     // A
-
-    // Washer 2
-    dmxWrite(17, rgb.r); // R
-    dmxWrite(18, rgb.g); // G
-    dmxWrite(19, rgb.b); // B
-    dmxWrite(21, w);     // A
+    // Update lights
+    updateDmxChannels(rgb, w);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
