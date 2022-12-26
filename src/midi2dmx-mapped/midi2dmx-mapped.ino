@@ -160,6 +160,9 @@ void dmxWrite(uint16_t channel, uint8_t value)
 
 void dmxUpdate()
 {
+    // This method fades DMX target buffer to DMX current buffer
+    // and then writes DMX current buffer to the MAX485 chip.
+
     static unsigned long fadeTime = 0;
 
     if (millis() >= fadeTime)
@@ -188,6 +191,7 @@ void initDmxChannels()
     // For example, I have some lights which need some channels
     // to be 255 to turn on.
 
+    // RGB Spot
     dmxWrite(1, 255);
     dmxWrite(2, 0); // R
     dmxWrite(3, 0); // G
@@ -195,9 +199,11 @@ void initDmxChannels()
     dmxWrite(5, 0);
     dmxWrite(6, 0);
 
+    // White Strobe
     dmxWrite(7, 0); // W
     dmxWrite(8, 0);
 
+    // Hex Washer 1
     dmxWrite(9, 0);  // R
     dmxWrite(10, 0); // G
     dmxWrite(11, 0); // B
@@ -207,6 +213,7 @@ void initDmxChannels()
     dmxWrite(15, 255);
     dmxWrite(16, 255);
 
+    // Hex Washer 2
     dmxWrite(17, 0); // R
     dmxWrite(18, 0); // G
     dmxWrite(19, 0); // B
@@ -219,14 +226,17 @@ void initDmxChannels()
 
 void writeRgb(RgbColor rgb)
 {
+    // Spot
     dmxWrite(2, rgb.r); // R
     dmxWrite(3, rgb.g); // G
     dmxWrite(4, rgb.b); // B
 
+    // Washer 1
     dmxWrite(9, rgb.r);  // R
     dmxWrite(10, rgb.g); // G
     dmxWrite(11, rgb.b); // B
 
+    // Washer 2
     dmxWrite(17, rgb.r); // R
     dmxWrite(18, rgb.g); // G
     dmxWrite(19, rgb.b); // B
@@ -328,9 +338,9 @@ void updateDmxByNotes()
 
     // Write white lights
     uint8_t w = white * colorDimmer;
-    dmxWrite(7, w);
-    dmxWrite(12, w);
-    dmxWrite(20, w);
+    dmxWrite(7, w);  // Strobe White
+    dmxWrite(13, w); // Amber Washer 1
+    dmxWrite(21, w); // Amber Washer 2
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
