@@ -143,9 +143,6 @@ void loop()
     MIDICoreSerial.read();
 #endif
 
-    // Update DMX values by notes played
-    updateDmxByNotes();
-
     // Send DMX values to lights
     dmxUpdate();
 }
@@ -224,24 +221,6 @@ void initDmxChannels()
     dmxWrite(24, 255);
 }
 
-void writeRgb(RgbColor rgb)
-{
-    // Spot
-    dmxWrite(2, rgb.r); // R
-    dmxWrite(3, rgb.g); // G
-    dmxWrite(4, rgb.b); // B
-
-    // Washer 1
-    dmxWrite(9, rgb.r);  // R
-    dmxWrite(10, rgb.g); // G
-    dmxWrite(11, rgb.b); // B
-
-    // Washer 2
-    dmxWrite(17, rgb.r); // R
-    dmxWrite(18, rgb.g); // G
-    dmxWrite(19, rgb.b); // B
-}
-
 RgbColor hsl2rgb(uint8_t hue, uint8_t saturation, uint8_t lightness)
 {
     RgbColor rgb;
@@ -301,46 +280,65 @@ RgbColor hsl2rgb(uint8_t hue, uint8_t saturation, uint8_t lightness)
     return rgb;
 }
 
-void updateDmxByNotes()
+void updateDmxByMidiIn()
 {
+    // This method updates DMX target buffer by the last midi note played,
+    // together with pitch bend (color bend) and modulation wheel (dimmer).
+
     static uint8_t hue   = 0;
     static uint8_t light = 0;
     static uint8_t white = 0;
 
-    // First two octaves is color wheel
+    // First two octaves is color wheel (c1 to b2)
     if (lastNoteNumber < 24)
     {
         hue   = lastNoteNumber / 24.0f * 256.0f;
         light = lastNoteVelocity + 128;
         // white = 0;
     }
-    // Third octave is white light dimmer
+    // Third octave is white light dimmer (c3 to b3)
     else if (lastNoteNumber < 36)
     {
         // light = 0;
         white = (lastNoteNumber - 24) / 11.0f * 255.0f;
     }
-    // Fourth octave, first half is all lights off
+    // Fourth octave, first half is all lights off (c4 to e4)
     else if (lastNoteNumber < 41)
     {
         light = 0;
         white = 0;
     }
-    // Fourth octave, second half is light fading speed
+    // Fourth octave, second half is light fading speed (f4 to c5)
     else if (lastNoteNumber < 49)
     {
         fadeNegInterval  = lastNoteNumber - 41;
         fadePosIncrement = 2;
     }
 
-    // Write color lights
-    writeRgb(hsl2rgb(hue + colorBend * 32.0f, 255, light * colorDimmer));
 
-    // Write white lights
-    uint8_t w = white * colorDimmer;
-    dmxWrite(7, w);  // Strobe White
-    dmxWrite(13, w); // Amber Washer 1
-    dmxWrite(21, w); // Amber Washer 2
+    // Calculate new light values and write them to lights
+    RgbColor rgb = hsl2rgb(hue + colorBend * 32.0f, 255, light * colorDimmer);
+    uint8_t  w   = white * colorDimmer;
+
+    // Spot
+    dmxWrite(2, rgb.r); // R
+    dmxWrite(3, rgb.g); // G
+    dmxWrite(4, rgb.b); // B
+
+    // Strobe
+    dmxWrite(7, w); // W
+
+    // Washer 1
+    dmxWrite(9, rgb.r);  // R
+    dmxWrite(10, rgb.g); // G
+    dmxWrite(11, rgb.b); // B
+    dmxWrite(13, w);     // A
+
+    // Washer 2
+    dmxWrite(17, rgb.r); // R
+    dmxWrite(18, rgb.g); // G
+    dmxWrite(19, rgb.b); // B
+    dmxWrite(21, w);     // A
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
@@ -356,6 +354,8 @@ static void OnNoteOn(byte channel, byte note, byte velocity)
 
     lastNoteNumber   = note - 36;
     lastNoteVelocity = velocity;
+
+    updateDmxByMidiIn();
 
     // Simply map MIDI note number to DMX channels
     // if (note > 0 && note <= DMX_NUM_CHAN)
@@ -404,6 +404,8 @@ static void OnControlChange(byte channel, byte number, byte value)
     if (number == 1)
         colorDimmer = value / 127.0f;
 
+    updateDmxByMidiIn();
+
     // Simply map MIDI control number to DMX channels
     // if (number > 0 && number <= DMX_NUM_CHAN)
     //     dmxWrite(number, value * 2); // * 2 to scale MIDI value (7-bit) to DMX (8-bit)
@@ -439,6 +441,8 @@ static void OnPitchBend(byte channel, int bend)
 #endif
 
     colorBend = bend / 8192.0f;
+
+    updateDmxByMidiIn();
 }
 
 static void OnSystemExclusive(byte * array, unsigned size)
