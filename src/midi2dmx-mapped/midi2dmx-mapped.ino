@@ -124,6 +124,9 @@ void setup()
     // Copy target buff values to the current one for a smooth startup
     for (int i = 0; i < DMX_NUM_CHAN; ++i)
         dmxCurrentBuff[i] = dmxTargetBuff[i];
+
+    // Apply the default color at startup
+    updateDmxByMidiIn();
 } // setup
 
 void loop()
@@ -292,9 +295,8 @@ static void OnNoteOn(byte channel, byte note, byte velocity)
     Serial.println(velocity);
 #endif
 
-    lastNoteNumber   = note - 36;
+    lastNoteNumber   = note - 36; // start at c1
     lastNoteVelocity = velocity;
-
     updateDmxByMidiIn();
 
     // Simply map MIDI note number to DMX channels
@@ -341,10 +343,11 @@ static void OnControlChange(byte channel, byte number, byte value)
     Serial.println(value);
 #endif
 
-    if (number == 1)
+    if (number == 1) // 1 = modulation wheel
+    {
         colorDimmer = value / 127.0f;
-
-    updateDmxByMidiIn();
+        updateDmxByMidiIn();
+    }
 
     // Simply map MIDI control number to DMX channels
     // if (number > 0 && number <= DMX_NUM_CHAN)
@@ -381,7 +384,6 @@ static void OnPitchBend(byte channel, int bend)
 #endif
 
     colorBend = bend / 8192.0f;
-
     updateDmxByMidiIn();
 }
 
@@ -452,6 +454,7 @@ static void OnStop()
 
     // Reset all DMX channels on MIDI transport stop
     initDmxChannels();
+    updateDmxByMidiIn(); // to keep the current color on
 }
 
 static void OnActiveSensing()
@@ -469,4 +472,5 @@ static void OnSystemReset()
 
     // Reset all DMX channels on MIDI system reset
     initDmxChannels();
+    updateDmxByMidiIn(); // to keep the current color on
 }
