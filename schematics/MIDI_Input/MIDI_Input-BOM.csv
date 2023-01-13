@@ -1,0 +1,6 @@
+"Comment","Designator","Footprint","LCSC"
+"100nF","C1","Capacitor_SMD:C_0603_1608Metric","C14663"
+"1N4148","D1","Diode_SMD:D_SOD-323_HandSoldering","C2128"
+"220","R1","Resistor_SMD:R_0603_1608Metric","C22962"
+"470","R2","Resistor_SMD:R_0603_1608Metric","C23179"
+"H11L1","U1","Package_DIP:SMDIP-6_W9.53mm","C899473"
