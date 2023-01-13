@@ -2,7 +2,7 @@
 
 [Video Tutorial on YouTube :)](https://youtu.be/dqrqfa0cMyE)
 
-## USB-MIDI to DMX-out
+## MIDI-in to DMX-out
 
 Firmware for a tiny but powerful tool which acts as a USB-MIDI device just like any modern synthesizer, but it doesn't make any sounds, it sends the MIDI messages as DMX values to your DMX lights system instead!
 
@@ -13,10 +13,11 @@ Enjoy! :)
 ## What hardware do I need?
 
 - An **ATmega32U4** microcontroller, for example:
-    - Arduino Leonardo (https://docs.arduino.cc/hardware/leonardo)
-    - Arduino Micro (https://store.arduino.cc/products/arduino-micro)
-    - Adafruit ItsyBitsy (https://www.adafruit.com/product/3677)
-    - DFRobot Beetle (https://www.dfrobot.com/product-1075.html)
+    - [Arduino Leonardo](https://docs.arduino.cc/hardware/leonardo)
+    - [Arduino Micro](https://store.arduino.cc/products/arduino-micro)
+    - [Arduino Pro Micro](https://www.sparkfun.com/products/12640)
+    - [Adafruit ItsyBitsy](https://www.adafruit.com/product/3677)
+    - [DFRobot Beetle](https://www.dfrobot.com/product-1075.html)
 - A **MAX485** module ([amazon.com](https://www.amazon.com/Max485-Chip-RS-485-Module-Raspberry/dp/B00NIOLNAG/ref=sr_1_3?crid=2LWYPWLXT9T3W&keywords=max485&qid=1658936062&sprefix=max48%2Caps%2C170&sr=8-3))
 - An **XLR-female** connector/panelmount or a short XLR cable to cut in half
 - A **Micro-USB** cable
@@ -36,13 +37,17 @@ Enjoy! :)
 
 Use the Arduino IDE and select **Arduino Leonardo** as the board, doesn't matter which 32U4 board you have from the list of boards above.
 
-## Schematic
+## Schematics
 
+#### USB-MIDI to DMX-out
 ![schematic](./images/schematic.jpg)
 
-## Finished Device
+## Finished Devices
 
-![device](./images/device.jpg)
+#### USB-MIDI to DMX-out
+![device_1](./images/device_1.jpg)
+#### DIN5-MIDI to DMX-out
+![device_2](./images/device_2.jpg)
 
 ## You're welcome!
 
