@@ -4,9 +4,9 @@
 
 ## MIDI-in to DMX-out
 
-Firmware for a tiny but powerful tool which acts as a USB-MIDI device just like any modern synthesizer, but it doesn't make any sounds, it sends the MIDI messages as DMX values to your DMX lights system instead!
+Firmware for a tiny but powerful MIDI device which acts just like any modern synthesizer or MIDI controller, but it doesn't make any sounds, it sends the MIDI messages as DMX values to your DMX lights system instead!
 
-Now you will not need these big and expensive DMX modules anymore and you'll never have to leave your DAW again to some other app to program your light show! Sync your beats with your lights and create a lightshow simply using MIDI notes and MIDI control changes. Need more control? Update the firmware with your custom code or create an Ableton Max for Live patch to get even more out of it!
+Now you will not need these big and expensive DMX modules anymore and you'll never have to leave your DAW again to some other app to program your light show! Sync your beats with your lights and create a lightshow simply using MIDI notes and MIDI control changes. Need more control? Update the firmware with your custom code or create an Ableton Max for Live patch to get even more out of it! And when you add the MIDI DIN5 input plug to your device, you can even use your synthesizer or MIDI controller to directly control your lights without using a computer, how awesome!
 
 Enjoy! :)
 
@@ -22,6 +22,7 @@ Enjoy! :)
 - An **XLR-female** connector/panelmount or a short XLR cable to cut in half
 - A **Micro-USB** cable
 - Some (jumper) cables
+- MIDI DIN5 input board (optional, see `schematics` to order the PCB yourself)
 
 **NOTE:** Other Arduino microcontrollers are not tested. You will _NEED_ a microcontroller which has native-USB support, just like the 32U4, otherwise the USB-MIDI won't work. There are workarounds e.g. for the Arduino Uno, but I won't get into detail on that here.
 
