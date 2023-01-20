@@ -1,6 +1,8 @@
 # MIDI2DMX
 
-[Video Tutorial on YouTube :)](https://youtu.be/dqrqfa0cMyE)
+Check out my video tutorials on YouTube! :)
+- [How to build your own USB-MIDI to DMX interface](https://youtu.be/dqrqfa0cMyE)
+- [How to build your own MIDI to DMX interface (DIN5 to XLR)](https://youtu.be/rJIh-3a-4dY)
 
 ## MIDI-in to DMX-out
 
