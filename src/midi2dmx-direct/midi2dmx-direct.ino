@@ -130,6 +130,8 @@ void initDmxChannels()
     // For example, I have some lights which need some channels
     // to be 255 to turn on.
 
+    // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
+
     DmxSimple.write(1, 255);
     DmxSimple.write(2, 0); // R
     DmxSimple.write(3, 0); // G

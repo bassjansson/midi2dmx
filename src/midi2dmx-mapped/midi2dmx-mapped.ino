@@ -181,6 +181,8 @@ void initDmxChannels()
     // For example, I have some lights which need some channels
     // to be 255 to turn on.
 
+    // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
+
     // RGB Spot
     dmxWrite(1, 255);
     dmxWrite(2, 0); // R
@@ -217,8 +219,10 @@ void initDmxChannels()
 void updateDmxChannels(RgbColor rgb, uint8_t w)
 {
     // Update your lights here!
-    // The function below calculates the RGB and white values for your lights,
-    // just map them correctly to your lights in this function just as I did.
+    // The function below this one calculates the RGB and white values for your lights,
+    // just map these values correctly to your lights in this function just as I did.
+
+    // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
 
     // RGB Spot
     dmxWrite(2, rgb.r); // R
