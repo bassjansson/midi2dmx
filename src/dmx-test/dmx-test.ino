@@ -12,8 +12,8 @@ void setup()
 #ifdef ENABLE_SERIAL_DEBUG
     // Initialize serial communication
     Serial.begin(115200);
-    while (!Serial) // Wait for native USB
-        delay(1);
+    // while (!Serial) // Wait for native USB
+    //     delay(1);
 #endif
 
     // Setup DMX
