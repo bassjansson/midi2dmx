@@ -216,7 +216,7 @@ void initDmxChannels()
     dmxWrite(24, 255);
 }
 
-void updateDmxChannels(RgbColor rgb, uint8_t w)
+void updateDmxChannels(RgbColor rgb, uint8_t w, uint8_t uv)
 {
     // Update your lights here!
     // The function below this one calculates the RGB and white values for your lights,
@@ -237,12 +237,14 @@ void updateDmxChannels(RgbColor rgb, uint8_t w)
     dmxWrite(10, rgb.g); // G
     dmxWrite(11, rgb.b); // B
     dmxWrite(13, w);     // A
+    dmxWrite(14, uv);    // UV
 
     // Hex Washer 2
     dmxWrite(17, rgb.r); // R
     dmxWrite(18, rgb.g); // G
     dmxWrite(19, rgb.b); // B
     dmxWrite(21, w);     // A
+    dmxWrite(22, uv);    // UV
 }
 
 void updateDmxByMidiIn()
@@ -253,6 +255,7 @@ void updateDmxByMidiIn()
     static uint8_t hue   = 0;
     static uint8_t light = 0;
     static uint8_t white = 0;
+    static uint8_t ultra = 0;
 
     // First two octaves is color wheel (c1 to b2)
     if (lastNoteNumber < 24)
@@ -267,11 +270,17 @@ void updateDmxByMidiIn()
         // light = 0;
         white = (lastNoteNumber - 24) / 11.0f * 255.0f;
     }
-    // Fourth octave, first half is all lights off (c4 to e4)
+    // Fourth octave, first half is ultra violet dimmer (c4 to d#4)
+    else if (lastNoteNumber < 40)
+    {
+        ultra = (lastNoteNumber - 36) / 3.0f * 255.0f;
+    }
+    // Fourth octave, 'e' note is color lights off (e4)
     else if (lastNoteNumber < 41)
     {
         light = 0;
-        white = 0;
+        // white = 0;
+        // ultra = 0;
     }
     // Fourth octave, second half is light fading speed (f4 to c5)
     else if (lastNoteNumber < 49)
@@ -283,9 +292,10 @@ void updateDmxByMidiIn()
     // Calculate new light values
     RgbColor rgb = hsl2rgb(hue + colorBend * 32.0f, 255, light * colorDimmer);
     uint8_t  w   = white * colorDimmer;
+    uint8_t  uv  = ultra * colorDimmer;
 
     // Update lights
-    updateDmxChannels(rgb, w);
+    updateDmxChannels(rgb, w, uv);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
