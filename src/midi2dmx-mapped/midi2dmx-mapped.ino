@@ -183,66 +183,47 @@ void initDmxChannels()
 
     // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
 
-    // RGB Spot
-    dmxWrite(1, 255);
-    dmxWrite(2, 0); // R
-    dmxWrite(3, 0); // G
-    dmxWrite(4, 0); // B
-    dmxWrite(5, 0);
-    dmxWrite(6, 0);
-
-    // White Strobe
-    dmxWrite(7, 0); // W
-    dmxWrite(8, 0);
-
-    // Hex Washer 1
-    dmxWrite(9, 0);  // R
-    dmxWrite(10, 0); // G
-    dmxWrite(11, 0); // B
-    dmxWrite(12, 0); // W
-    dmxWrite(13, 0); // A
-    dmxWrite(14, 0); // UV
-    dmxWrite(15, 255);
-    dmxWrite(16, 255);
-
-    // Hex Washer 2
-    dmxWrite(17, 0); // R
-    dmxWrite(18, 0); // G
-    dmxWrite(19, 0); // B
-    dmxWrite(20, 0); // W
-    dmxWrite(21, 0); // A
-    dmxWrite(22, 0); // UV
-    dmxWrite(23, 255);
-    dmxWrite(24, 255);
+    DmxSimple.write(1, 0); // e.g. Red
+    DmxSimple.write(2, 0); // e.g. Green
+    DmxSimple.write(3, 0); // e.g. Blue
+    DmxSimple.write(4, 0); // e.g. Dimming
+    DmxSimple.write(5, 0); // e.g. Strobe
+    DmxSimple.write(6, 0); // e.g. Program
+    DmxSimple.write(7, 0);
+    DmxSimple.write(8, 0);
+    DmxSimple.write(9, 0);
+    DmxSimple.write(10, 0);
+    DmxSimple.write(11, 0);
+    DmxSimple.write(12, 0);
+    DmxSimple.write(13, 0);
+    DmxSimple.write(14, 0);
+    DmxSimple.write(15, 0);
+    DmxSimple.write(16, 0);
+    DmxSimple.write(17, 0);
+    DmxSimple.write(18, 0);
+    DmxSimple.write(19, 0);
+    DmxSimple.write(20, 0);
+    DmxSimple.write(21, 0);
+    DmxSimple.write(22, 0);
+    DmxSimple.write(23, 0);
+    DmxSimple.write(24, 0);
 }
 
 void updateDmxChannels(RgbColor rgb, uint8_t w)
 {
     // Update your lights here!
     // The function below this one calculates the RGB and white values for your lights,
-    // just map these values correctly to your lights in this function just as I did.
+    // just map these values correctly to your lights as done in the example code below.
 
     // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
 
-    // RGB Spot
-    dmxWrite(2, rgb.r); // R
-    dmxWrite(3, rgb.g); // G
-    dmxWrite(4, rgb.b); // B
+    // e.g. RGB Light on channel 1, using the first 3 channels for RGB
+    dmxWrite(1, rgb.r); // e.g. Red
+    dmxWrite(2, rgb.g); // e.g. Green
+    dmxWrite(3, rgb.b); // e.g. Blue
 
-    // White Strobe
-    dmxWrite(7, w); // W
-
-    // Hex Washer 1
-    dmxWrite(9, rgb.r);  // R
-    dmxWrite(10, rgb.g); // G
-    dmxWrite(11, rgb.b); // B
-    dmxWrite(13, w);     // A
-
-    // Hex Washer 2
-    dmxWrite(17, rgb.r); // R
-    dmxWrite(18, rgb.g); // G
-    dmxWrite(19, rgb.b); // B
-    dmxWrite(21, w);     // A
+    // e.g. White Light on channel 8, using the first channel for brightness
+    dmxWrite(8, w); // e.g. White
 }
 
 void updateDmxByMidiIn()

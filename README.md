@@ -40,6 +40,15 @@ Enjoy! :)
 
 Use the Arduino IDE and select **Arduino Leonardo** as the board, doesn't matter which 32U4 board you have from the list of boards above.
 
+In case you are building the Beetle device from the first tutorial, start with the `midi2dmx-direct.ino` program.
+In case you are building the DIN5 device from the second tutorial, start with the `midi2dmx-mapped.ino` program.
+
+Do not forget to check the pin numbers and update them if necessary!
+
+It might be that some of your lights need some channels to be on another state than 0 before they turn on at all. For example, I have some lights which need some channels to be 255 to turn on because of some program function which needs to be selected. So please init your lights in the method `initDmxChannels()` if they happen to need that!
+
+If you are using a synthesizer to control your lights, you probably want to use the mapped version. But, every setup is different, and every light works differently, so please update the method `updateDmxChannels()` to match your lighting setup!
+
 ## Schematics
 
 #### USB-MIDI to DMX-out

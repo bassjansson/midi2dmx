@@ -1,7 +1,7 @@
 // #define ENABLE_SERIAL_DEBUG // Uncomment this define to enable serial debugging
 
-#define USE_USB_MIDI    // Comment this define to disable use of USB-MIDI
-#define USE_SERIAL_MIDI // Comment this define to disable use of DIN-5 Serial MIDI
+#define USE_USB_MIDI // Comment this define to disable use of USB-MIDI
+// #define USE_SERIAL_MIDI // Uncomment this define to enable use of DIN-5 Serial MIDI
 
 #ifdef USE_USB_MIDI
     #include <USB-MIDI.h>
@@ -14,8 +14,8 @@
 
 #define ON_LED_PIN   13 // Built-in LED, change if using another pin
 
-#define DMX_TX_PIN   16 // Transmit pin, connect to DI of MAX485 module
-#define DMX_DE_PIN   9  // Enable pin, connect to DE+RE of MAX485 module
+#define DMX_TX_PIN   1  // Transmit pin, connect to DI of MAX485 module
+#define DMX_DE_PIN   10 // Enable pin, connect to DE+RE of MAX485 module
 
 #define MIDI_CHANNEL MIDI_CHANNEL_OMNI // MIDI channel to listen to, omni means all channels
 #define DMX_NUM_CHAN 24                // Number of DMX channels to use, maximum is 512 (if sufficient RAM)
@@ -132,33 +132,30 @@ void initDmxChannels()
 
     // ==> UPDATE THE NUMBERS BELOW WITH YOUR DMX CHANNEL CONFIGURATION! <==
 
-    DmxSimple.write(1, 255);
-    DmxSimple.write(2, 0); // R
-    DmxSimple.write(3, 0); // G
-    DmxSimple.write(4, 0); // B
-    DmxSimple.write(5, 0);
-    DmxSimple.write(6, 0);
-
-    DmxSimple.write(7, 0); // W
+    DmxSimple.write(1, 0); // e.g. Red
+    DmxSimple.write(2, 0); // e.g. Green
+    DmxSimple.write(3, 0); // e.g. Blue
+    DmxSimple.write(4, 0); // e.g. Dimming
+    DmxSimple.write(5, 0); // e.g. Strobe
+    DmxSimple.write(6, 0); // e.g. Program
+    DmxSimple.write(7, 0);
     DmxSimple.write(8, 0);
-
-    DmxSimple.write(9, 0);  // R
-    DmxSimple.write(10, 0); // G
-    DmxSimple.write(11, 0); // B
-    DmxSimple.write(12, 0); // W
-    DmxSimple.write(13, 0); // A
-    DmxSimple.write(14, 0); // UV
-    DmxSimple.write(15, 255);
-    DmxSimple.write(16, 255);
-
-    DmxSimple.write(17, 0); // R
-    DmxSimple.write(18, 0); // G
-    DmxSimple.write(19, 0); // B
-    DmxSimple.write(20, 0); // W
-    DmxSimple.write(21, 0); // A
-    DmxSimple.write(22, 0); // UV
-    DmxSimple.write(23, 255);
-    DmxSimple.write(24, 255);
+    DmxSimple.write(9, 0);
+    DmxSimple.write(10, 0);
+    DmxSimple.write(11, 0);
+    DmxSimple.write(12, 0);
+    DmxSimple.write(13, 0);
+    DmxSimple.write(14, 0);
+    DmxSimple.write(15, 0);
+    DmxSimple.write(16, 0);
+    DmxSimple.write(17, 0);
+    DmxSimple.write(18, 0);
+    DmxSimple.write(19, 0);
+    DmxSimple.write(20, 0);
+    DmxSimple.write(21, 0);
+    DmxSimple.write(22, 0);
+    DmxSimple.write(23, 0);
+    DmxSimple.write(24, 0);
 }
 
 static void OnNoteOn(byte channel, byte note, byte velocity)
